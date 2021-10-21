@@ -5,10 +5,13 @@ VisualStudioVersion = 16.0.31402.337
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "JAApp", "JAApp\JAApp.vcxproj", "{D2307A26-DDAC-4E31-83AB-A9D0B143A3B0}"
 	ProjectSection(ProjectDependencies) = postProject
+		{CB743204-5152-4B8F-9A28-D855CC4F7C16} = {CB743204-5152-4B8F-9A28-D855CC4F7C16}
 		{6939CEE0-BEDD-47E8-A495-E3C6BDC4856D} = {6939CEE0-BEDD-47E8-A495-E3C6BDC4856D}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "JADll", "JADll\JADll.vcxproj", "{6939CEE0-BEDD-47E8-A495-E3C6BDC4856D}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "JADll_in_Cpp", "JADll_in_Cpp\JADll_in_Cpp.vcxproj", "{CB743204-5152-4B8F-9A28-D855CC4F7C16}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -34,6 +37,14 @@ Global
 		{6939CEE0-BEDD-47E8-A495-E3C6BDC4856D}.Release|x64.Build.0 = Release|x64
 		{6939CEE0-BEDD-47E8-A495-E3C6BDC4856D}.Release|x86.ActiveCfg = Release|Win32
 		{6939CEE0-BEDD-47E8-A495-E3C6BDC4856D}.Release|x86.Build.0 = Release|Win32
+		{CB743204-5152-4B8F-9A28-D855CC4F7C16}.Debug|x64.ActiveCfg = Debug|x64
+		{CB743204-5152-4B8F-9A28-D855CC4F7C16}.Debug|x64.Build.0 = Debug|x64
+		{CB743204-5152-4B8F-9A28-D855CC4F7C16}.Debug|x86.ActiveCfg = Debug|Win32
+		{CB743204-5152-4B8F-9A28-D855CC4F7C16}.Debug|x86.Build.0 = Debug|Win32
+		{CB743204-5152-4B8F-9A28-D855CC4F7C16}.Release|x64.ActiveCfg = Release|x64
+		{CB743204-5152-4B8F-9A28-D855CC4F7C16}.Release|x64.Build.0 = Release|x64
+		{CB743204-5152-4B8F-9A28-D855CC4F7C16}.Release|x86.ActiveCfg = Release|Win32
+		{CB743204-5152-4B8F-9A28-D855CC4F7C16}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
