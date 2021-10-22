@@ -1,7 +1,0 @@
-﻿  JADll_in_cpp.cpp
-C:\Users\0_0\Documents\Assembler projekt\tc2221t_assembler_mandelbrot\JASol\JADll_in_Cpp\JADll_in_cpp.cpp(6,1): warning C4005: 'JADLL_IN_CPP_API': macro redefinition
-C:\Users\0_0\Documents\Assembler projekt\tc2221t_assembler_mandelbrot\JASol\JADll_in_Cpp\JADll_in_cpp.h(7): message : see previous definition of 'JADLL_IN_CPP_API'
-C:\Users\0_0\Documents\Assembler projekt\tc2221t_assembler_mandelbrot\JASol\JADll_in_Cpp\JADll_in_cpp.cpp(9,1): warning C4273: 'Procedura1': inconsistent dll linkage
-C:\Users\0_0\Documents\Assembler projekt\tc2221t_assembler_mandelbrot\JASol\JADll_in_Cpp\JADll_in_cpp.h(12,33): message : see previous definition of 'Procedura1'
-     Creating library C:\Users\0_0\Documents\Assembler projekt\tc2221t_assembler_mandelbrot\JASol\Debug\JADll_in_Cpp.lib and object C:\Users\0_0\Documents\Assembler projekt\tc2221t_assembler_mandelbrot\JASol\Debug\JADll_in_Cpp.exp
-  JADll_in_Cpp.vcxproj -> C:\Users\0_0\Documents\Assembler projekt\tc2221t_assembler_mandelbrot\JASol\Debug\JADll_in_Cpp.dll
