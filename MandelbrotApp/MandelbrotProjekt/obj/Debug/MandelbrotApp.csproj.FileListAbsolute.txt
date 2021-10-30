@@ -1,0 +1,10 @@
+C:\Users\0_0\Documents\Assembler projekt\tc2221t_assembler_mandelbrot\MandelbrotApp\MandelbrotProjekt\bin\Debug\MandelbrotProjekt.exe.config
+C:\Users\0_0\Documents\Assembler projekt\tc2221t_assembler_mandelbrot\MandelbrotApp\MandelbrotProjekt\bin\Debug\MandelbrotProjekt.exe
+C:\Users\0_0\Documents\Assembler projekt\tc2221t_assembler_mandelbrot\MandelbrotApp\MandelbrotProjekt\bin\Debug\MandelbrotProjekt.pdb
+C:\Users\0_0\Documents\Assembler projekt\tc2221t_assembler_mandelbrot\MandelbrotApp\MandelbrotProjekt\obj\Debug\MandelbrotApp.csproj.AssemblyReference.cache
+C:\Users\0_0\Documents\Assembler projekt\tc2221t_assembler_mandelbrot\MandelbrotApp\MandelbrotProjekt\obj\Debug\MandelbrotProjekt.appWindow.resources
+C:\Users\0_0\Documents\Assembler projekt\tc2221t_assembler_mandelbrot\MandelbrotApp\MandelbrotProjekt\obj\Debug\MandelbrotProjekt.Properties.Resources.resources
+C:\Users\0_0\Documents\Assembler projekt\tc2221t_assembler_mandelbrot\MandelbrotApp\MandelbrotProjekt\obj\Debug\MandelbrotApp.csproj.GenerateResource.cache
+C:\Users\0_0\Documents\Assembler projekt\tc2221t_assembler_mandelbrot\MandelbrotApp\MandelbrotProjekt\obj\Debug\MandelbrotApp.csproj.CoreCompileInputs.cache
+C:\Users\0_0\Documents\Assembler projekt\tc2221t_assembler_mandelbrot\MandelbrotApp\MandelbrotProjekt\obj\Debug\MandelbrotProjekt.exe
+C:\Users\0_0\Documents\Assembler projekt\tc2221t_assembler_mandelbrot\MandelbrotApp\MandelbrotProjekt\obj\Debug\MandelbrotProjekt.pdb

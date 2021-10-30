@@ -1,7 +1,0 @@
-﻿  MandelbrotCpp.cpp
-C:\Users\0_0\Documents\Assembler projekt\tc2221t_assembler_mandelbrot\MandelbrotProjekt\MandelbrotDllC\MandelbrotCpp.cpp(5,1): warning C4005: 'MANDELBROTCPP_API': macro redefinition
-C:\Users\0_0\Documents\Assembler projekt\tc2221t_assembler_mandelbrot\MandelbrotProjekt\MandelbrotDllC\MandelbrotCpp.h(7): message : see previous definition of 'MANDELBROTCPP_API'
-C:\Users\0_0\Documents\Assembler projekt\tc2221t_assembler_mandelbrot\MandelbrotProjekt\MandelbrotDllC\MandelbrotCpp.cpp(8,1): warning C4273: 'Procedura1': inconsistent dll linkage
-C:\Users\0_0\Documents\Assembler projekt\tc2221t_assembler_mandelbrot\MandelbrotProjekt\MandelbrotDllC\MandelbrotCpp.h(12,34): message : see previous definition of 'Procedura1'
-     Creating library C:\Users\0_0\Documents\Assembler projekt\tc2221t_assembler_mandelbrot\MandelbrotProjekt\Debug\MandelbrotDllC.lib and object C:\Users\0_0\Documents\Assembler projekt\tc2221t_assembler_mandelbrot\MandelbrotProjekt\Debug\MandelbrotDllC.exp
-  MandelbrotDllC.vcxproj -> C:\Users\0_0\Documents\Assembler projekt\tc2221t_assembler_mandelbrot\MandelbrotProjekt\Debug\MandelbrotDllC.dll

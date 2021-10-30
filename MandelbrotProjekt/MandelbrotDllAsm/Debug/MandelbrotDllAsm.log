@@ -1,7 +1,0 @@
-﻿  Assembling Mandelbrotdll.asm...
-Mandelbrotdll.asm(14): warning A6004: procedure argument or local not referenced : hInstDLL
-Mandelbrotdll.asm(14): warning A6004: procedure argument or local not referenced : reason
-Mandelbrotdll.asm(14): warning A6004: procedure argument or local not referenced : reserved1
-     Creating library C:\Users\0_0\Documents\Assembler projekt\tc2221t_assembler_mandelbrot\MandelbrotProjekt\Debug\MandelbrotDllAsm.lib and object C:\Users\0_0\Documents\Assembler projekt\tc2221t_assembler_mandelbrot\MandelbrotProjekt\Debug\MandelbrotDllAsm.exp
-MandelbrotDllAsm.exp : warning LNK4070: /OUT:JADll.dll directive in .EXP differs from output filename 'C:\Users\0_0\Documents\Assembler projekt\tc2221t_assembler_mandelbrot\MandelbrotProjekt\Debug\MandelbrotDllAsm.dll'; ignoring directive
-  MandelbrotDllAsm.vcxproj -> C:\Users\0_0\Documents\Assembler projekt\tc2221t_assembler_mandelbrot\MandelbrotProjekt\Debug\MandelbrotDllAsm.dll
