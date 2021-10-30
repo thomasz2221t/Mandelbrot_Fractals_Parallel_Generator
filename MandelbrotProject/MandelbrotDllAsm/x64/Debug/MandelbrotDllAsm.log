@@ -1,0 +1,8 @@
+﻿  Performing Custom Build Tools
+  Microsoft (R) Macro Assembler (x64) Version 14.29.30037.0
+  Copyright (C) Microsoft Corporation.  All rights reserved.
+  
+   Assembling: Mandelbrotdll.asm
+     Creating library C:\Users\0_0\Documents\Assembler_projekt\tc2221t_assembler_mandelbrot\MandelbrotProject\x64\Debug\MandelbrotDllAsm.lib and object C:\Users\0_0\Documents\Assembler_projekt\tc2221t_assembler_mandelbrot\MandelbrotProject\x64\Debug\MandelbrotDllAsm.exp
+MandelbrotDllAsm.exp : warning LNK4070: /OUT:JADll.dll directive in .EXP differs from output filename 'C:\Users\0_0\Documents\Assembler_projekt\tc2221t_assembler_mandelbrot\MandelbrotProject\x64\Debug\MandelbrotDllAsm.dll'; ignoring directive
+  MandelbrotDllAsm.vcxproj -> C:\Users\0_0\Documents\Assembler_projekt\tc2221t_assembler_mandelbrot\MandelbrotProject\x64\Debug\MandelbrotDllAsm.dll

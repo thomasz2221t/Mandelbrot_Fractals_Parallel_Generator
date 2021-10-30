@@ -1,0 +1,61 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31402.337
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MandelbrotApp", "MandelbrotApp\MandelbrotApp.csproj", "{670AA45B-4E5A-4728-ADEB-383C3ADB40B3}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MandelbrotDllAsm", "MandelbrotDllAsm\MandelbrotDllAsm.vcxproj", "{D4743252-9B04-466F-B2B8-E1920865BA93}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MandelbrotDllCpp", "MandelbrotDllCpp\MandelbrotDllCpp.vcxproj", "{6800EB08-0132-42F8-91B8-1FF256824726}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{670AA45B-4E5A-4728-ADEB-383C3ADB40B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{670AA45B-4E5A-4728-ADEB-383C3ADB40B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{670AA45B-4E5A-4728-ADEB-383C3ADB40B3}.Debug|x64.ActiveCfg = Debug|x64
+		{670AA45B-4E5A-4728-ADEB-383C3ADB40B3}.Debug|x64.Build.0 = Debug|x64
+		{670AA45B-4E5A-4728-ADEB-383C3ADB40B3}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{670AA45B-4E5A-4728-ADEB-383C3ADB40B3}.Debug|x86.Build.0 = Debug|Any CPU
+		{670AA45B-4E5A-4728-ADEB-383C3ADB40B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{670AA45B-4E5A-4728-ADEB-383C3ADB40B3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{670AA45B-4E5A-4728-ADEB-383C3ADB40B3}.Release|x64.ActiveCfg = Release|Any CPU
+		{670AA45B-4E5A-4728-ADEB-383C3ADB40B3}.Release|x64.Build.0 = Release|Any CPU
+		{670AA45B-4E5A-4728-ADEB-383C3ADB40B3}.Release|x86.ActiveCfg = Release|Any CPU
+		{670AA45B-4E5A-4728-ADEB-383C3ADB40B3}.Release|x86.Build.0 = Release|Any CPU
+		{D4743252-9B04-466F-B2B8-E1920865BA93}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{D4743252-9B04-466F-B2B8-E1920865BA93}.Debug|x64.ActiveCfg = Debug|x64
+		{D4743252-9B04-466F-B2B8-E1920865BA93}.Debug|x64.Build.0 = Debug|x64
+		{D4743252-9B04-466F-B2B8-E1920865BA93}.Debug|x86.ActiveCfg = Debug|Win32
+		{D4743252-9B04-466F-B2B8-E1920865BA93}.Debug|x86.Build.0 = Debug|Win32
+		{D4743252-9B04-466F-B2B8-E1920865BA93}.Release|Any CPU.ActiveCfg = Release|Win32
+		{D4743252-9B04-466F-B2B8-E1920865BA93}.Release|x64.ActiveCfg = Release|x64
+		{D4743252-9B04-466F-B2B8-E1920865BA93}.Release|x64.Build.0 = Release|x64
+		{D4743252-9B04-466F-B2B8-E1920865BA93}.Release|x86.ActiveCfg = Release|Win32
+		{D4743252-9B04-466F-B2B8-E1920865BA93}.Release|x86.Build.0 = Release|Win32
+		{6800EB08-0132-42F8-91B8-1FF256824726}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{6800EB08-0132-42F8-91B8-1FF256824726}.Debug|x64.ActiveCfg = Debug|x64
+		{6800EB08-0132-42F8-91B8-1FF256824726}.Debug|x64.Build.0 = Debug|x64
+		{6800EB08-0132-42F8-91B8-1FF256824726}.Debug|x86.ActiveCfg = Debug|Win32
+		{6800EB08-0132-42F8-91B8-1FF256824726}.Debug|x86.Build.0 = Debug|Win32
+		{6800EB08-0132-42F8-91B8-1FF256824726}.Release|Any CPU.ActiveCfg = Release|Win32
+		{6800EB08-0132-42F8-91B8-1FF256824726}.Release|x64.ActiveCfg = Release|x64
+		{6800EB08-0132-42F8-91B8-1FF256824726}.Release|x64.Build.0 = Release|x64
+		{6800EB08-0132-42F8-91B8-1FF256824726}.Release|x86.ActiveCfg = Release|Win32
+		{6800EB08-0132-42F8-91B8-1FF256824726}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {09433657-370E-454D-A922-79C34FC1407D}
+	EndGlobalSection
+EndGlobal
