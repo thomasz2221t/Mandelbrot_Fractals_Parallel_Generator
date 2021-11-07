@@ -12,6 +12,7 @@ using System.Threading;
 using System.Diagnostics;
 using System.Drawing.Imaging;
 
+
 namespace MandelbrotApp
 {
     public partial class appWindow : Form
@@ -21,8 +22,8 @@ namespace MandelbrotApp
             InitializeComponent();
         }
 
-        [DllImport("C:\\Users\\0_0\\Documents\\Assembler_projekt\\tc2221t_assembler_mandelbrot\\MandelbrotProject\\x64\\Debug\\MandelbrotDllCpp.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "Procedura1")]
-        public static extern int Procedura1(int x, int y);
+        [DllImport("C:\\Users\\0_0\\Documents\\Assembler_projekt\\tc2221t_assembler_mandelbrot\\MandelbrotProject\\x64\\Debug\\MandelbrotDllCpp.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "generateMandelbrotFraktalCpp")]
+        public static extern int generateMandelbrotFraktalCpp(byte[] imageBuffer, int bufforLength, int bitmapPieceX, int bitmapPieceY);
 
         [DllImport("C:\\Users\\0_0\\Documents\\Assembler_projekt\\tc2221t_assembler_mandelbrot\\MandelbrotProject\\x64\\Debug\\MandelbrotDllAsm.dll")]
         public static extern void MyProc1(ulong[] data);
@@ -33,6 +34,10 @@ namespace MandelbrotApp
         int resolutionX; //resolution horizontal parameter
         int resolutionY; //resolution vertical parameter 
         string outputFilePath; //path to the output file with fractal
+        double maxRealis = 0.7;
+        double minRealis = -1.5;
+        double maxImaginaris = -1.0;
+        double minImaginaris = 1;
 
         private void iterationLabel_Click(object sender, EventArgs e)
         {
@@ -112,8 +117,38 @@ namespace MandelbrotApp
 
         private void proceedButton_Click(object sender, EventArgs e)
         {
+            void runMandelbrotDllCpp(object partOfBitmap)
+            {
+                Bitmap bitmapFrame = (Bitmap) partOfBitmap;
+                BitmapData bmpData = bitmapFrame.LockBits(new Rectangle(0,0, bitmapFrame.Width, bitmapFrame.Height), System.Drawing.Imaging.ImageLockMode.ReadWrite, System.Drawing.Imaging.PixelFormat.Format32bppRgb);
+
+                // Get the address of the first line.
+                IntPtr ptr = bmpData.Scan0;
+
+                // Declare an array to hold the bytes of the bitmap. 
+                int bitmapBytesCount = Math.Abs(bmpData.Stride) * bitmapFrame.Height;//how many bytes there are
+                byte[] bitmapValuesTable = new byte[bitmapBytesCount];//bytes table
+
+                // Copy the RGB values into the array.
+                System.Runtime.InteropServices.Marshal.Copy(ptr, bitmapValuesTable, 0, bitmapBytesCount);
+
+                for(int i=0; i<100; i++)
+                {
+                    Console.WriteLine("bit: {0}", bitmapValuesTable[i]);
+
+                }
+                //Executing the cpp function
+                int result = generateMandelbrotFraktalCpp(bitmapValuesTable,bitmapBytesCount, bitmapFrame.Width, bitmapFrame.Height);
+                Console.WriteLine("result: {0}", result);
+
+                // Unlock the bits.
+                bitmapFrame.UnlockBits(bmpData);
+                return;
+            }
+
             void thread_function1(object a)
             {
+
                 for (int i = 0; i < 10; i++)
                 {
                     Console.WriteLine("The thread's numer is {0} i= {1}", a, i);
@@ -130,29 +165,72 @@ namespace MandelbrotApp
             }
             */
 
-            void saveBitmapToFile(Bitmap bitmapObject, string fileSaveDirection)
+            void saveBitmapToFile(Bitmap bitmapImage, string fileSaveDirection)
             {
+                //if (System.IO.File.Exists(fileSaveDirection))
+                //    System.IO.File.Delete(fileSaveDirection);
+
                 //bitmapObject.Save(fileSaveDirection, System.Drawing.Imaging.ImageFormat.Bmp);
-                bitmapObject.Save("C:\\Users\\0_0\\Documents\\Assembler_projekt\\tc2221t_assembler_mandelbrot\\MandelbrotProject\\OutputFiles\\MandelbrotFraktal.bmp", System.Drawing.Imaging.ImageFormat.Bmp);
+
+                if (System.IO.File.Exists("C:\\Users\\0_0\\Documents\\Assembler_projekt\\tc2221t_assembler_mandelbrot\\MandelbrotProject\\OutputFiles\\MandelbrotFraktal.bmp"))
+                { 
+                    System.IO.File.Delete("C:\\Users\\0_0\\Documents\\Assembler_projekt\\tc2221t_assembler_mandelbrot\\MandelbrotProject\\OutputFiles\\MandelbrotFraktal.bmp");
+                }
+
+                bitmapImage.Save("C:\\Users\\0_0\\Documents\\Assembler_projekt\\tc2221t_assembler_mandelbrot\\MandelbrotProject\\OutputFiles\\MandelbrotFraktal.bmp");
+                bitmapImage.Dispose();//cleaning up after the image
                 return;
             }
 
-            Bitmap generateTheBitmap(int resolutionX, int resolutionY)
+            void checkPartioningOfTheBitmap(Bitmap bitmapImage, string fileSaveDirection, int i)
+            {
+                bitmapImage.Save("C:\\Users\\0_0\\Documents\\Assembler_projekt\\tc2221t_assembler_mandelbrot\\MandelbrotProject\\OutputFiles\\MandelbrotFraktalTest.bmp");
+                bitmapImage.Dispose();//cleaning up after the image
+                return;
+            }
+
+            void generateTheBitmap(int resolutionX, int resolutionY,Bitmap bitmapImage)
             {
                 //Making integer table an bitmap
-                Bitmap bitmapObject = new Bitmap(resolutionX, resolutionY, PixelFormat.Format32bppRgb);
+                //Bitmap bitmapObject = new Bitmap(resolutionX, resolutionY, PixelFormat.Format32bppRgb);
 
                 //reseting color of bitmap
                 for(int y=0; y<resolutionY; y++)
                 {
                     for(int x=0; x<resolutionX; x++)
                     {
-                        Color pixelColor = bitmapObject.GetPixel(x, y);
+                        Color pixelColor = bitmapImage.GetPixel(x, y);
                         Color newColor = Color.FromArgb(0, 0, 0);//RGB 255 for white colour, RGB 0 for black colour
-                        bitmapObject.SetPixel(x, y, newColor);
+                        bitmapImage.SetPixel(x, y, newColor);
                     }
                 }
-                return bitmapObject;
+
+                return;
+            }
+
+            Bitmap cropBitmap(Bitmap bitmapImage, Rectangle cutSection, int point_of_bitmapX, int point_of_bitmapY)
+            {
+                Bitmap cutedBitmap = new Bitmap(cutSection.Width, cutSection.Height);
+                using (Graphics g = Graphics.FromImage(bitmapImage))
+                {
+                    g.DrawImage(bitmapImage, point_of_bitmapX, point_of_bitmapY, cutSection, GraphicsUnit.Pixel);
+                    return cutedBitmap;
+                }
+            }
+
+            Bitmap AppendBitmap(Bitmap bitmapInput, Bitmap bitmapOutput)
+            {
+                int w = Math.Max(bitmapInput.Width, bitmapOutput.Width);
+                int h = bitmapInput.Height + bitmapOutput.Height;
+                Bitmap mergeBitmap = new Bitmap(w, h);
+
+                using (Graphics g = Graphics.FromImage(mergeBitmap))
+                {
+                    g.DrawImage(bitmapInput, 0, 0);
+                    g.DrawImage(bitmapOutput, 0, bitmapInput.Height);
+                }
+
+                return mergeBitmap;
             }
 
             iterationButton_Click(sender, EventArgs.Empty);
@@ -165,9 +243,11 @@ namespace MandelbrotApp
             Console.WriteLine("resolution: {0} x {1}", resolutionX, resolutionY);
             Console.WriteLine("file path: {0}", outputFilePath);
 
-            Bitmap bitmapImage = generateTheBitmap(resolutionX,resolutionY);
+            //Making integer table an bitmap
+            Bitmap bitmapObject = new Bitmap(resolutionX, resolutionY, PixelFormat.Format32bppRgb);
+            generateTheBitmap(resolutionX, resolutionY,bitmapObject);
 
-            saveBitmapToFile(bitmapImage, outputFilePath);
+            //saveBitmapToFile(bitmapObject, outputFilePath);
 
             Thread[] array_of_threads = new Thread[threadsInput]; //tablica do przechowywania wątków
 
@@ -176,7 +256,21 @@ namespace MandelbrotApp
                 //cpp
                 for(int i = 0; i<threadsInput; i++)
                 {
-                    array_of_threads[i] = new Thread(thread_function1);
+                    Rectangle section = new Rectangle(new Point(0,(resolutionY/threadsInput)*i), new Size(resolutionX, resolutionY/ threadsInput));
+                    Bitmap partOfBitmap = cropBitmap(bitmapObject, section, 0, (resolutionY / threadsInput) * i);
+
+                    int x = partOfBitmap.Width;
+                    int y = partOfBitmap.Height;
+
+                    array_of_threads[i] = new Thread(runMandelbrotDllCpp);
+                    array_of_threads[i].Start(partOfBitmap);
+
+
+                    //if(i==0)
+                    //{
+                    //checkPartioningOfTheBitmap(partOfBitmap,"",i);
+                   // }
+                    //partOfBitmap.Dispose();
                 }
             }
             else
@@ -191,11 +285,11 @@ namespace MandelbrotApp
             Stopwatch stopWatch = new Stopwatch();//obsluga czasu
             stopWatch.Start();
 
-            for (int i = 0; i < threadsInput; i++)
-            {
-                array_of_threads[i].Start(2);//rozpoczynamy watki
-                Thread.Sleep(100);
-            }
+            //for (int i = 0; i < threadsInput; i++)
+            //{
+            //    array_of_threads[i].Start(2);//rozpoczynamy watki
+            //    Thread.Sleep(100);
+            //}
 
             //for (int i = 0; i < threadsInput; i++)
             //{
@@ -209,8 +303,8 @@ namespace MandelbrotApp
             string elapsedTime = time_period.TotalMilliseconds.ToString();
             Console.WriteLine("Time of executing dll library in miliseconds {0} for dll library in language: {1}", elapsedTime, (isAsmOrCpp ? "cpp" : "asm"));
 
-            int z = Procedura1(3, 4);
-            Console.WriteLine("Dll Cpp: {0}", z);
+            //int z = generateMandelbrotFraktalCpp(3, 4);
+           // Console.WriteLine("Dll Cpp: {0}", z);
 
 
             ulong[] data = new ulong[4] { 0, 0, 0, 0 };

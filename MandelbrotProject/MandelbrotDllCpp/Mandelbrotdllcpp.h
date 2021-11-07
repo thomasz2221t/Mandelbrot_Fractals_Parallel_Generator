@@ -8,4 +8,4 @@
 
 #include <windows.h>
 
-extern "C" MANDELBROTCPP_API int Procedura1(int x, int y);
+extern "C" MANDELBROTCPP_API int generateMandelbrotFraktalCpp(byte* imageBuffer, int bufforLength, int bitmapPieceX, int bitmapPieceY);
