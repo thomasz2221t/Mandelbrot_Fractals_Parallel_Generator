@@ -11,7 +11,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Diagnostics;
 using System.Drawing.Imaging;
-
+using System.IO;
 
 namespace MandelbrotApp
 {
@@ -23,10 +23,10 @@ namespace MandelbrotApp
         }
 
         [DllImport("C:\\Users\\0_0\\Documents\\Assembler_projekt\\tc2221t_assembler_mandelbrot\\MandelbrotProject\\x64\\Debug\\MandelbrotDllCpp.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "generateMandelbrotFraktalCpp")]
-        public static extern int generateMandelbrotFraktalCpp(byte[] imageBuffer, int bufforLength, int bitmapPieceX, int bitmapPieceY);
+        public static extern long generateMandelbrotFraktalCpp(byte[] imageBuffer, long subTabBeginPoint, long sizeOfSubTable, int dimensionX, int dimensionY, long maxIteration, double minR, double maxR, double minI, double maxI);
 
         [DllImport("C:\\Users\\0_0\\Documents\\Assembler_projekt\\tc2221t_assembler_mandelbrot\\MandelbrotProject\\x64\\Debug\\MandelbrotDllAsm.dll")]
-        public static extern void MyProc1(ulong[] data);
+        public static extern void MyProc1(byte[] data);
 
         long iteratorInput; //the input value set by the user as number of iteration cycles
         int threadsInput; //number of threads to divide the bitmap into chosen by the user
@@ -39,6 +39,7 @@ namespace MandelbrotApp
         double maxImaginaris = -1.0;
         double minImaginaris = 1;
 
+        static Mutex objMutex = new Mutex();
         private void iterationLabel_Click(object sender, EventArgs e)
         {
 
@@ -117,32 +118,47 @@ namespace MandelbrotApp
 
         private void proceedButton_Click(object sender, EventArgs e)
         {
-            void runMandelbrotDllCpp(object partOfBitmap)
+            //void runMandelbrotDllCpp(Bitmap partOfBitmap, int bitMapX, int bitMapY, int dimensionX, int dimensionY, long maxIteration, int numThreads, double minR, double maxR, double minI, double maxI)
+            void runMandelbrotDllCpp(byte[] bitMapValuesTable, long subTabBeginPoint, long sizeOfSubTable, int dimensionX, int dimensionY, long maxIteration, double minR, double maxR, double minI, double maxI)
             {
-                Bitmap bitmapFrame = (Bitmap) partOfBitmap;
-                BitmapData bmpData = bitmapFrame.LockBits(new Rectangle(0,0, bitmapFrame.Width, bitmapFrame.Height), System.Drawing.Imaging.ImageLockMode.ReadWrite, System.Drawing.Imaging.PixelFormat.Format32bppRgb);
-
+                Console.WriteLine("Threat input: begin at: {0}, size: {1}", subTabBeginPoint, sizeOfSubTable);
+                //Bitmap bitmapFrame = partOfBitmap;
+                //BitmapData bmpData = bitmapFrame.LockBits(new Rectangle(0,0, bitmapFrame.Width, bitmapFrame.Height), System.Drawing.Imaging.ImageLockMode.ReadWrite, System.Drawing.Imaging.PixelFormat.Format32bppRgb);
                 // Get the address of the first line.
-                IntPtr ptr = bmpData.Scan0;
-
+                //IntPtr ptr = bmpData.Scan0;
                 // Declare an array to hold the bytes of the bitmap. 
-                int bitmapBytesCount = Math.Abs(bmpData.Stride) * bitmapFrame.Height;//how many bytes there are
-                byte[] bitmapValuesTable = new byte[bitmapBytesCount];//bytes table
-
+                //int bitmapBytesCount = Math.Abs(bmpData.Stride) * bitmapFrame.Height;//how many bytes there are
+                //byte[] bitmapValuesTable = new byte[bitmapBytesCount];//bytes table
                 // Copy the RGB values into the array.
-                System.Runtime.InteropServices.Marshal.Copy(ptr, bitmapValuesTable, 0, bitmapBytesCount);
+                //System.Runtime.InteropServices.Marshal.Copy(ptr, bitmapValuesTable, 0, bitmapBytesCount);
 
-                for(int i=0; i<100; i++)
-                {
-                    Console.WriteLine("bit: {0}", bitmapValuesTable[i]);
+                byte[] partOfBmTable = new byte[3*sizeOfSubTable];
 
-                }
                 //Executing the cpp function
-                int result = generateMandelbrotFraktalCpp(bitmapValuesTable,bitmapBytesCount, bitmapFrame.Width, bitmapFrame.Height);
+                long result = generateMandelbrotFraktalCpp(partOfBmTable, subTabBeginPoint, sizeOfSubTable, dimensionX, dimensionY, maxIteration, minR, maxR, minI, maxI);
                 Console.WriteLine("result: {0}", result);
 
+
+                Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} Waiting..." );
+                objMutex.WaitOne();
+                /*for (long i = subTabBeginPoint; i < 3*sizeOfSubTable; i++)
+                {
+                    Console.WriteLine("{0}: {1} ", i, partOfBmTable[i]);
+                }*/
+
+                for (long  i = 3*subTabBeginPoint; i<3*(sizeOfSubTable+subTabBeginPoint); i++)
+                {
+                    bitMapValuesTable[i] = partOfBmTable[i-3*subTabBeginPoint];
+                }
+                Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} Finished Writting...");
+                objMutex.ReleaseMutex();
+
+                // foreach(byte parame in bitmapValuesTable)
+                //{
+                //    Console.WriteLine("{0:X16}",parame);
+                //}
                 // Unlock the bits.
-                bitmapFrame.UnlockBits(bmpData);
+                //bitmapFrame.UnlockBits(bmpData);
                 return;
             }
 
@@ -165,7 +181,7 @@ namespace MandelbrotApp
             }
             */
 
-            void saveBitmapToFile(Bitmap bitmapImage, string fileSaveDirection)
+           /* void saveBitmapToFile(Bitmap bitmapImage, string fileSaveDirection)
             {
                 //if (System.IO.File.Exists(fileSaveDirection))
                 //    System.IO.File.Delete(fileSaveDirection);
@@ -179,6 +195,29 @@ namespace MandelbrotApp
 
                 bitmapImage.Save("C:\\Users\\0_0\\Documents\\Assembler_projekt\\tc2221t_assembler_mandelbrot\\MandelbrotProject\\OutputFiles\\MandelbrotFraktal.bmp");
                 bitmapImage.Dispose();//cleaning up after the image
+                return;
+            }*/
+
+            void saveBitmapToFile(byte[] bitmapTable, string fileSaveDirection)
+            {
+
+                if (System.IO.File.Exists("C:\\Users\\0_0\\Documents\\Assembler_projekt\\tc2221t_assembler_mandelbrot\\MandelbrotProject\\OutputFiles\\MandelbrotFraktal.bmp"))
+                {
+                    System.IO.File.Delete("C:\\Users\\0_0\\Documents\\Assembler_projekt\\tc2221t_assembler_mandelbrot\\MandelbrotProject\\OutputFiles\\MandelbrotFraktal.bmp");
+                }
+
+                using (var bitmapImage = new Bitmap(resolutionX, resolutionY, PixelFormat.Format24bppRgb))
+                {
+                    BitmapData bmpData = bitmapImage.LockBits(new Rectangle(0, 0, bitmapImage.Width, bitmapImage.Height), ImageLockMode.WriteOnly, bitmapImage.PixelFormat);
+
+                    Marshal.Copy(bitmapTable, 0, bmpData.Scan0, bitmapTable.Length);
+
+                    bitmapImage.UnlockBits(bmpData);
+
+                    bitmapImage.Save("C:\\Users\\0_0\\Documents\\Assembler_projekt\\tc2221t_assembler_mandelbrot\\MandelbrotProject\\OutputFiles\\MandelbrotFraktal.bmp");
+                }
+                Console.WriteLine("Written to file!!");
+                //bitmapImage.Dispose();//cleaning up after the image
                 return;
             }
 
@@ -200,7 +239,7 @@ namespace MandelbrotApp
                     for(int x=0; x<resolutionX; x++)
                     {
                         Color pixelColor = bitmapImage.GetPixel(x, y);
-                        Color newColor = Color.FromArgb(0, 0, 0);//RGB 255 for white colour, RGB 0 for black colour
+                        Color newColor = Color.FromArgb(255, 255, 255);//RGB 255 for white colour, RGB 0 for black colour
                         bitmapImage.SetPixel(x, y, newColor);
                     }
                 }
@@ -244,34 +283,58 @@ namespace MandelbrotApp
             Console.WriteLine("file path: {0}", outputFilePath);
 
             //Making integer table an bitmap
-            Bitmap bitmapObject = new Bitmap(resolutionX, resolutionY, PixelFormat.Format32bppRgb);
-            generateTheBitmap(resolutionX, resolutionY,bitmapObject);
-
+            //Bitmap bitmapObject = new Bitmap(resolutionX, resolutionY, PixelFormat.Format32bppRgb);
+            //generateTheBitmap(resolutionX, resolutionY,bitmapObject);
             //saveBitmapToFile(bitmapObject, outputFilePath);
 
-            Thread[] array_of_threads = new Thread[threadsInput]; //tablica do przechowywania wątków
+            //making 1dim byte array that suits the resolution
+            byte[] bitMapPixelValues = new byte [3*resolutionX*resolutionY];//3RGB values * resolutionX*resolutionY
 
-            if(isAsmOrCpp)
+            Thread[] array_of_threads = new Thread[threadsInput]; //tablica do przechowywania wątków
+            Stopwatch stopWatch = new Stopwatch();//obsluga czasu
+
+            if (isAsmOrCpp)
             {
                 //cpp
-                for(int i = 0; i<threadsInput; i++)
+                long sizeOfSubTable = (resolutionX * resolutionY) / threadsInput;
+                int offset = 0;
+                if (sizeOfSubTable * threadsInput < resolutionX * resolutionY)
                 {
-                    Rectangle section = new Rectangle(new Point(0,(resolutionY/threadsInput)*i), new Size(resolutionX, resolutionY/ threadsInput));
-                    Bitmap partOfBitmap = cropBitmap(bitmapObject, section, 0, (resolutionY / threadsInput) * i);
+                    offset = (int)((resolutionX * resolutionY) - (sizeOfSubTable * threadsInput));
+                    sizeOfSubTable += offset;
+                }
 
-                    int x = partOfBitmap.Width;
-                    int y = partOfBitmap.Height;
+                for (int i = 0; i<threadsInput; i++)
+                {
+                    //Rectangle section = new Rectangle(new Point(0,(resolutionY/threadsInput)*i), new Size(resolutionX, resolutionY/ threadsInput));
+                    //Bitmap partOfBitmap = cropBitmap(bitmapObject, section, 0, (resolutionY / threadsInput) * i);
+                    //int x = partOfBitmap.Width;
+                    //int y = partOfBitmap.Height;
 
-                    array_of_threads[i] = new Thread(runMandelbrotDllCpp);
-                    array_of_threads[i].Start(partOfBitmap);
+                    //correct the begginig of the second thread tab beggining
+                    if ((offset > 0)&&(i == 1))//if offset == 0 no effect
+                    {
+                        sizeOfSubTable -= offset;
+                    }
 
+                    long subTabBeginPoint = 0;
+                    if(i != 0)
+                    {
+                        subTabBeginPoint = (sizeOfSubTable * i) + offset;
+                    }
+
+                    stopWatch.Start();
+                    array_of_threads[i] = new Thread(unused => runMandelbrotDllCpp(bitMapPixelValues, subTabBeginPoint, sizeOfSubTable, resolutionX, resolutionY, iteratorInput, minRealis, maxRealis, minImaginaris, maxImaginaris));
+                    array_of_threads[i].Start();
+                    //Thread.Sleep(1000);
 
                     //if(i==0)
-                    //{
+                    // {
                     //checkPartioningOfTheBitmap(partOfBitmap,"",i);
-                   // }
+                    //  }
                     //partOfBitmap.Dispose();
                 }
+                
             }
             else
             {
@@ -280,10 +343,7 @@ namespace MandelbrotApp
                 {
                     array_of_threads[i] = new Thread(thread_function1);
                 }
-            }    
-
-            Stopwatch stopWatch = new Stopwatch();//obsluga czasu
-            stopWatch.Start();
+            }
 
             //for (int i = 0; i < threadsInput; i++)
             //{
@@ -291,11 +351,35 @@ namespace MandelbrotApp
             //    Thread.Sleep(100);
             //}
 
-            //for (int i = 0; i < threadsInput; i++)
-            //{
+             /*bool threadAlive = true;
+             while(threadAlive == false)
+             {
+                 threadAlive = false;
+                 for (int i = 0; i < array_of_threads.Length; i++)
+                 {
+                     //array_of_threads[i].Join();//synchronizacja watkow (bez sensu jak juz sie koncza
+                     if(threadAlive == false)
+                     {
+                         threadAlive = array_of_threads[i].IsAlive;
+                     }
+                 }
+             }*/
 
-            //     array_of_threads[i].Join();//synchronizacja watkow (bez sensu jak juz sie koncza
-            //}
+            foreach (Thread workingThread in array_of_threads)
+            {
+                workingThread.Join();
+            }
+
+            /*bool threadAlive = true;
+            while (threadAlive == false)
+            {
+                threadAlive = true;
+                for (int i = 0; i < array_of_threads.Length; i++)
+                {
+                    //array_of_threads[i].Join();//synchronizacja watkow (bez sensu jak juz sie koncza
+                    threadAlive = array_of_threads[i].IsAlive;
+                }
+            }*/
 
             stopWatch.Stop();
 
@@ -303,11 +387,15 @@ namespace MandelbrotApp
             string elapsedTime = time_period.TotalMilliseconds.ToString();
             Console.WriteLine("Time of executing dll library in miliseconds {0} for dll library in language: {1}", elapsedTime, (isAsmOrCpp ? "cpp" : "asm"));
 
-            //int z = generateMandelbrotFraktalCpp(3, 4);
-           // Console.WriteLine("Dll Cpp: {0}", z);
+            //checking bitMapPixelValue table
+            /*for (int i = 0; i < bitMapPixelValues.Length; i++)
+             {
+                 Console.Write("{0}: {1}, ",i,bitMapPixelValues[i]);
+             }*/
 
+            saveBitmapToFile(bitMapPixelValues, outputFilePath);
 
-            ulong[] data = new ulong[4] { 0, 0, 0, 0 };
+            byte[] data = new byte[4] { 0, 0, 0, 0 };
             Console.WriteLine("{0:X16}", data[0]);
             MyProc1(data);
             Console.WriteLine("{0:X16}", data[0]);

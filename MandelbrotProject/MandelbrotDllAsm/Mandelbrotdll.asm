@@ -13,7 +13,7 @@ DllMain proc                            ;return true
 DllMain endp
 
 MyProc1 proc                            ;[rcx] = 0123456789abcdefh
-        mov     rax, 0123456789abcdefh
+        mov     rax, 11111111
         mov     [rcx],rax
         ret     0
 MyProc1 endp
