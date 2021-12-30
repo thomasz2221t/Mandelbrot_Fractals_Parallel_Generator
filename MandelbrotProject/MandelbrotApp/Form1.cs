@@ -26,7 +26,7 @@ namespace MandelbrotApp
         public static extern long generateMandelbrotFraktalCpp(byte[] imageBuffer, long subTabBeginPoint, long sizeOfSubTable, int dimensionX, int dimensionY, long maxIteration, double minR, double maxR, double minI, double maxI);
 
         [DllImport("C:\\Users\\0_0\\Documents\\Assembler_projekt\\tc2221t_assembler_mandelbrot\\MandelbrotProject\\x64\\Debug\\MandelbrotDllAsm.dll")]
-        public static extern void MyProc1(byte[] data);
+        public static extern void generateMandelbrotFraktalAsm(byte[] imageBuffer, long subTabBeginPoint, long sizeOfSubTable, int dimensionX, int dimensionY, long maxIteration, double minR, double maxR, double minI, double maxI);
 
         long iteratorInput; //the input value set by the user as number of iteration cycles
         int threadsInput; //number of threads to divide the bitmap into chosen by the user
@@ -162,13 +162,26 @@ namespace MandelbrotApp
                 return;
             }
 
-            void thread_function1(object a)
+            void runMandelbrotDllAsm(byte[] bitMapValuesTable, long subTabBeginPoint, long sizeOfSubTable, int dimensionX, int dimensionY, long maxIteration, double minR, double maxR, double minI, double maxI)
             {
+                byte[] partOfBmTable = new byte[3 * sizeOfSubTable];
 
-                for (int i = 0; i < 10; i++)
+
+
+
+                Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} Waiting...");
+                objMutex.WaitOne();
+                /*for (long i = subTabBeginPoint; i < 3*sizeOfSubTable; i++)
                 {
-                    Console.WriteLine("The thread's numer is {0} i= {1}", a, i);
+                    Console.WriteLine("{0}: {1} ", i, partOfBmTable[i]);
+                }*/
+
+                for (long i = 3 * subTabBeginPoint; i < 3 * (sizeOfSubTable + subTabBeginPoint); i++)
+                {
+                    bitMapValuesTable[i] = partOfBmTable[i - 3 * subTabBeginPoint];
                 }
+                Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} Finished Writting...");
+                objMutex.ReleaseMutex();
                 return;
             }
             /*
@@ -304,6 +317,7 @@ namespace MandelbrotApp
                     sizeOfSubTable += offset;
                 }
 
+                stopWatch.Start();
                 for (int i = 0; i<threadsInput; i++)
                 {
                     //Rectangle section = new Rectangle(new Point(0,(resolutionY/threadsInput)*i), new Size(resolutionX, resolutionY/ threadsInput));
@@ -323,7 +337,6 @@ namespace MandelbrotApp
                         subTabBeginPoint = (sizeOfSubTable * i) + offset;
                     }
 
-                    stopWatch.Start();
                     array_of_threads[i] = new Thread(unused => runMandelbrotDllCpp(bitMapPixelValues, subTabBeginPoint, sizeOfSubTable, resolutionX, resolutionY, iteratorInput, minRealis, maxRealis, minImaginaris, maxImaginaris));
                     array_of_threads[i].Start();
                     //Thread.Sleep(1000);
@@ -338,10 +351,31 @@ namespace MandelbrotApp
             }
             else
             {
-                //asm
-                for(int i = 0; i<threadsInput; i++)
+                long sizeOfSubTable = (resolutionX * resolutionY) / threadsInput;
+                int offset = 0;
+                if (sizeOfSubTable * threadsInput < resolutionX * resolutionY)
                 {
-                    array_of_threads[i] = new Thread(thread_function1);
+                    offset = (int)((resolutionX * resolutionY) - (sizeOfSubTable * threadsInput));
+                    sizeOfSubTable += offset;
+                }
+
+                //asm
+                for (int i = 0; i<threadsInput; i++)
+                {
+                    //correct the begginig of the second thread tab beggining
+                    if ((offset > 0) && (i == 1))//if offset == 0 no effect
+                    {
+                        sizeOfSubTable -= offset;
+                    }
+
+                    long subTabBeginPoint = 0;
+                    if (i != 0)
+                    {
+                        subTabBeginPoint = (sizeOfSubTable * i) + offset;
+                    }
+
+                    array_of_threads[i] = new Thread(unused => runMandelbrotDllAsm(bitMapPixelValues, subTabBeginPoint, sizeOfSubTable, resolutionX, resolutionY, iteratorInput, minRealis, maxRealis, minImaginaris, maxImaginaris));
+                    array_of_threads[i].Start();
                 }
             }
 
@@ -395,10 +429,7 @@ namespace MandelbrotApp
 
             saveBitmapToFile(bitMapPixelValues, outputFilePath);
 
-            byte[] data = new byte[4] { 0, 0, 0, 0 };
-            Console.WriteLine("{0:X16}", data[0]);
-            MyProc1(data);
-            Console.WriteLine("{0:X16}", data[0]);
+
 
         }
     }

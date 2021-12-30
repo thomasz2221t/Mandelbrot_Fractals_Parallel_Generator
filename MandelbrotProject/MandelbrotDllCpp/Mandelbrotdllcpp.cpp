@@ -48,7 +48,7 @@ extern "C" {
 
 			//nadanie wartosc rgb
 			//int r = ((int)(i * sinf(i)) % 256); <- C3861 nie wiem czemu ale nie umie znalezc sinf
-			int r = ((int)(n * 2*n) % 256);
+			int r = ((int)(n * 2 * n) % 256);
 			int g = ((n * n) % 256);
 			int b = (n % 256);
 
