@@ -351,6 +351,7 @@ namespace MandelbrotApp
             }
             else
             {
+                //asm
                 long sizeOfSubTable = (resolutionX * resolutionY) / threadsInput;
                 int offset = 0;
                 if (sizeOfSubTable * threadsInput < resolutionX * resolutionY)
@@ -359,7 +360,6 @@ namespace MandelbrotApp
                     sizeOfSubTable += offset;
                 }
 
-                //asm
                 for (int i = 0; i<threadsInput; i++)
                 {
                     //correct the begginig of the second thread tab beggining
