@@ -16,9 +16,12 @@
         subArrayOffset qword 0
         pixelX dword 0
         pixelY dword 0
+        numberOfPixelCells qword 0
 
         pixelReal real8 4 dup (0.0)
         pixelImaginars real8 4 dup (0.0)
+        complexPlaneLimit real8 4 dup (4.0)
+        iterationResult dword 4 dup (0)
 
 
         .code
@@ -97,10 +100,14 @@ ComplexPlaneLoop:
             add rbx, subTabBeginPoint
             sub rbx, rcx
             mov rax, rbx ;buffor zeby zapamietac wartosc operacji
-            div rbx, 4
+            ;idiv rbx, 4h
+            sar rbx, 2
+            mov r15,4 ;potrzebne do dzialania cmov
             cmp rdx, 0
-            cmove rax, 4; jezeli nie zostana cztery komorki tablicy to wtedy do r8 przekazane zostanie tyle ile zostalo
-            
+            cmove rax, r15; jezeli nie zostana cztery komorki tablicy to wtedy do r8 przekazane zostanie tyle ile zostalo
+
+            mov numberOfPixelCells, rax ;zapisanie w ramie ile komorek pamieci bedziemy przetwarzac
+
             mov r8, rax ;przygotowanie petli sterujacej uzyskiwaniem 4 elementowego wektora doubli dla cReal i cImaginaris
             mov r9, [pixelReal]
             mov r10, [pixelImaginars]
@@ -158,17 +165,100 @@ ComplexPlaneLoop:
 		    ;    i++;
 	        ;}
 
-            ;int n = i
+            ;vcmpeq_ospd = cmpleps CMPPD
+            ;vmovmskpd MOVMSKPD
+            ;ymm0 - zRealis
+            ;ymm1 - zImaginaris
+            ;ymm2 - tmp
+            ;ymm3 - tmp
+            ;pixelReal - px (cRealis) ymm4
+            ;pixelImaginars - py - (CImaginaris) ymm5
+            ;ymm6 - zliczone iteracje
+            ;ymm7 - wektor wypelniony 4, potrzebny do kalkulacji maski
+            ;ymm8 - 
+            vmovapd ymm4, ymmword ptr [pixelReal]
+            vmovapd ymm5, ymmword ptr [pixelImaginars]
+            vmovapd ymm7, ymmword ptr [complexPlaneLimit]
+            vmovapd ymm0, ymm4 ;ymm0 = zRealis (zaczyna sie od cRealis)
+            vmovapd ymm1, ymm5 ;ymm1 = zImaginaris(zaczyna siê od cImaginaris)
+            vxorpd  ymm6, ymm6, ymm6; wyzerowanie rejestru z wynikiem
+            mov rbx, maxIterator; ustawienie maksymalnej liczby iteracji do licznika petli
+            CheckingMandelbrot:
+                vmovapd ymm2, ymm0 ;ymm2 = zRealis
+                vmulpd  ymm0, ymm0, ymm0 ;ymm0 = zRealis^2
+                vmovapd ymm3, ymm1 ;ymm3 = zImaginaris
+                vaddpd ymm1, ymm1, ymm1 ;ymm1 = 2*zImaginaris
 
-			;int r = ((int)(n * 2 * n) % 256)
-			;int g = ((n * n) % 256)
-			;int b = (n % 256)
+                vmulpd ymm1, ymm1, ymm2 ;ymm1 = 2*zImaginaris*zRealis
+                vmovapd ymm2, ymm0 ;ymm2 = zRealis^2
+                vmulpd ymm3, ymm3, ymm3 ;ymm3 = zImaginaris^2
 
-			;imageBuffer[3 * (i-subTabBeginPoint)] = b;
-			;imageBuffer[(3 * (i-subTabBeginPoint)) + 1] = g;
-			;imageBuffer[(3 * (i-subTabBeginPoint)) + 2] = r;
+                vmovapd ymm1, ymm5 ;ymm1 = 2*zImaginaris*zRealis*CImaginaris = y
+                vsubpd  ymm0, ymm0, ymm3 ;ymm0 = zRealis^2 - zImaginaris^2
+                vaddpd  ymm2, ymm2, ymm3 ;ymm2 = zRealis^2 + zImaginaris^2 = warunek while
 
-		;}
+                vcmplepd ymm2, ymm2, ymm7 ;nadanie ymm2 maski - jezeli ymm2 <= ymm7 (4.0) ustaw jeden. Jezeli przekroczy 4 ustaw 0.
+                vaddpd  ymm0, ymm0, ymm4 ;ymm0 = zRealis^2 - zImaginaris^2 + cRealis = x
+
+                vmovmskpd rax, ymm2 ;pobranie maski do rejestr akumulatora
+                test rax,rax ;sprawdzenie czy wszystkie sprawdzanie piksele wyszly poza 4.0, jezeli tak przerwij petle
+                jz TerminateChecking
+                vandpd  ymm2, ymm2, ymm7 ;przepisanie maski do rejestru ymm2, maski uzywamy do inkrementowania rejestru wynikowego ymm6
+                vaddpd ymm6, ymm6, ymm2 ;dodanie rejestru ymm2 przechowoujacego wyniki iteracji petli do rejestru przechowujacego wynik
+                sub rbx,1
+                jnz CheckingMandelbrot
+          TerminateChecking:
+            ;przepisanie wyniku dzialania petli z rejestru ymm6 do kolejnych komorek tablicy wynikowej z funkcja koloryzujaca
+            ;vmovapd ymmword ptr [iterationResult], ymm6
+
+            ;ymm0 - r
+            vmovapd ymm7, ymmword ptr [complexPlaneLimit]
+            vdivpd  ymm6, ymm6, ymm7 ;podzielenie wyniku przez 4, dzieki czemu otrzymamy sama liczbe iteracji 
+            vcvtpd2udq xmm0, ymm6
+            movdqu  xmmword ptr [iterationResult], xmm0 ;cztery wartosci pikseli
+
+            mov rbx, numberOfPixelCells; liczba pikseli do zapisu!! - tutaj ustawic potem poprawke na tablice nie podzielna przez 4
+            mov r8d, [iterationResult]
+            mov r9, [imageBuffer]
+            xor r10d, r10d
+            mov r14d,256
+            ;rdx, rax, rcx
+            WriteLoop:
+                mov r11d, dword ptr [r8 + r10]; r
+                mov r12d,r11d; g
+                mov r13d, r11d; b
+                ;int r = ((int)(n * 2 * n) % 256)
+                imul r11d,r11d
+                add r11d,r11d
+                mov eax, r11d
+                idiv r14d
+                mov r11d, edx
+                ;int g = ((n * n) % 256)
+                imul r12d,r12d
+                mov eax, r12d
+                idiv r14d
+                mov r12d,edx
+                ;int b = (n % 256)
+                mov eax, r13d
+                idiv r14d
+                mov r13d, edx
+
+                add r10d, 4
+                dec rbx
+
+                ;obliczanie indeksu 3*(i-subTabBeginPoint)
+                mov rax, rcx
+                mov r15, subTabBeginPoint
+                sub rax, r15
+                imul rax, 3
+                add rax, r9 ;dodanie do indeksacji tablicy jej polozenia w pamieci zdefiniowanego w rejestrze r9
+                ;imageBuffer[3 * (i-subTabBeginPoint)] = b;
+                mov dword ptr[rax + r10], r11d
+			    ;imageBuffer[(3 * (i-subTabBeginPoint)) + 1] = g;
+                mov dword ptr[rax + r10], r12d
+			    ;imageBuffer[(3 * (i-subTabBeginPoint)) + 2] = r;
+                mov dword ptr[rax + r10], r13d
+                jnz WriteLoop
 
         add rcx, 4; i+= 4
         ;sprawdzenie warunku petli
