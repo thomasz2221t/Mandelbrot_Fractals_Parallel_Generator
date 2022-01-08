@@ -1,2 +1,2 @@
-^C:\USERS\0_0\DOCUMENTS\ASSEMBLER_PROJEKT\TC2221T_ASSEMBLER_MANDELBROT\MANDELBROTPROJECT\MANDELBROTDLLASM\MANDELBROTDLL.ASM
-ml64 /c /Zi /FoC:\Users\0_0\Documents\Assembler_projekt\tc2221t_assembler_mandelbrot\MandelbrotProject\x64\Debug\\Mandelbrotdll.obj Mandelbrotdll.asm
+^C:\USERS\0_0\DOCUMENTS\ASSEMBLERPROJEKT2\TC2221T_ASSEMBLER_MANDELBROT\MANDELBROTPROJECT\MANDELBROTDLLASM\MANDELBROTDLL.ASM
+ml64 /c /Zi /FoC:\Users\0_0\Documents\Assemblerprojekt2\tc2221t_assembler_mandelbrot\MandelbrotProject\x64\Debug\\Mandelbrotdll.obj Mandelbrotdll.asm

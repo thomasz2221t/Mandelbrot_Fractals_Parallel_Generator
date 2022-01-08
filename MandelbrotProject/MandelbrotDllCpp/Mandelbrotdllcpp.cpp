@@ -23,7 +23,7 @@ extern "C" {
 	* @param imageBuffer - tablica reprezentujaca abstract pixeli bitmapy
 	* @param bitMapX - wartosc poczatkowa tablicy, ktora ma zostac obsluzona w tym watku
 	* @param bitMapY - wartosc koncowa tablicy, ktora ma zostac obsluzona w tym watku
-	* @param dimensionX - wartosc pozioma rozdzielczosci okna 
+	* @param dimensionX - wartosc pozioma rozdzielczosci okna
 	* @param dimensionY - wartosc pionowa rozdzielczosci okna
 	* @param maxIteration - maksymalna liczba iteracji
 	* @param numThreads - ilosc watkow zadeklarowana przez uzytkownika
@@ -35,7 +35,7 @@ extern "C" {
 	MANDELBROTCPP_API long  generateMandelbrotFraktalCpp(byte* imageBuffer, long subTabBeginPoint, long sizeOfSubTable, int dimensionX, int dimensionY, long maxIteration, double minR, double maxR, double minI, double maxI)
 	{
 		long operations = 0;
-		for (long i = subTabBeginPoint; i < (sizeOfSubTable+subTabBeginPoint); i++)
+		for (long i = subTabBeginPoint; i < (sizeOfSubTable + subTabBeginPoint); i++)
 		{
 			int x = i % dimensionX;
 			int y = i / dimensionX;
@@ -52,9 +52,9 @@ extern "C" {
 			int g = ((n * n) % 256);
 			int b = (n % 256);
 
-			imageBuffer[3 * (i-subTabBeginPoint)] = b;
-			imageBuffer[(3 * (i-subTabBeginPoint)) + 1] = g;
-			imageBuffer[(3 * (i-subTabBeginPoint)) + 2] = r;
+			imageBuffer[3 * (i - subTabBeginPoint)] = b;
+			imageBuffer[(3 * (i - subTabBeginPoint)) + 1] = g;
+			imageBuffer[(3 * (i - subTabBeginPoint)) + 2] = r;
 			operations++;
 		}
 		return operations;
@@ -98,7 +98,7 @@ double mapToReal(int x, int resolutionX, double minR, double maxR)
 	return x * (range / resolutionX) + minR;
 }
 
-/** Funckja dokonuje konwersji wartosci pixela do liczby urojonej jaka pixel ma na plaszczyznie zespolonej. Najpierw liczymy zakres jakie maja liczby urojone na plaszczyznie (maxI - minI), a nastepnie dzielimy ten zakres przez rozdzielczosc pionowa okna - otrzymujemy wspolczynnik przeskalowania dla kazdego pixela. Mnozymy wspolczynnik przez wartosc y tabeli (pionowa pozycje komorki) i otrzymujemy wartosc pixela przy plaszczyznie zespolonej zaczynajacej sie w pionie od 0. Nastepnie dodajemy poprawke minI aby wartosc pixela obliczona byla dla plaszczyzny zespolonej ktora wybralismy. 
+/** Funckja dokonuje konwersji wartosci pixela do liczby urojonej jaka pixel ma na plaszczyznie zespolonej. Najpierw liczymy zakres jakie maja liczby urojone na plaszczyznie (maxI - minI), a nastepnie dzielimy ten zakres przez rozdzielczosc pionowa okna - otrzymujemy wspolczynnik przeskalowania dla kazdego pixela. Mnozymy wspolczynnik przez wartosc y tabeli (pionowa pozycje komorki) i otrzymujemy wartosc pixela przy plaszczyznie zespolonej zaczynajacej sie w pionie od 0. Nastepnie dodajemy poprawke minI aby wartosc pixela obliczona byla dla plaszczyzny zespolonej ktora wybralismy.
 * @param y - wartosc y komorki tablicy reprezentujaca pixele
 * @param resolutionY - rozdzielczosc pionowa okna
 * @param minI - minimalna wartosc urojona plaszczyzny zespolonej
