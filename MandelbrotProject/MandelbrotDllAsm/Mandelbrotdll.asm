@@ -332,7 +332,7 @@ ComplexPlaneLoop:
         ;sprawdzenie warunku petli
         mov rbx, qword ptr [rbp+48]
         ; sizeofSubTable + subTabBeginPoint
-        add rbx, r12
+        add rbx, r9
         cmp rsi,  rbx
         jl ComplexPlaneLoop
         

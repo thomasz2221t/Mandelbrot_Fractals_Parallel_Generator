@@ -22,10 +22,10 @@ namespace MandelbrotApp
             InitializeComponent();
         }
 
-        [DllImport("C:\\Users\\0_0\\Documents\\Assemblerprojekt2\\tc2221t_assembler_mandelbrot\\MandelbrotProject\\x64\\Debug\\MandelbrotDllCpp.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "generateMandelbrotFraktalCpp")]
+        [DllImport("C:\\Users\\0_0\\Documents\\Assembler_projekt\\tc2221t_assembler_mandelbrot\\MandelbrotProject\\x64\\Debug\\MandelbrotDllCpp.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "generateMandelbrotFraktalCpp")]
         public static extern long generateMandelbrotFraktalCpp(byte[] imageBuffer, long subTabBeginPoint, long sizeOfSubTable, int dimensionX, int dimensionY, long maxIteration, double minR, double maxR, double minI, double maxI);
 
-        [DllImport("C:\\Users\\0_0\\Documents\\Assemblerprojekt2\\tc2221t_assembler_mandelbrot\\MandelbrotProject\\x64\\Debug\\MandelbrotDllAsm.dll")]
+        [DllImport("C:\\Users\\0_0\\Documents\\Assembler_projekt\\tc2221t_assembler_mandelbrot\\MandelbrotProject\\x64\\Debug\\MandelbrotDllAsm.dll")]
         public static extern long generateMandelbrotFraktalAsm(double[] imageBuffer, double[] tableMappedToReal, double[] tableMappedToImaginaris,  long subTabBeginPoint, long sizeOfSubTable, long maxIteration);
 
         long iteratorInput; //the input value set by the user as number of iteration cycles
@@ -98,9 +98,9 @@ namespace MandelbrotApp
                 int y = (int)i / dimensionX;
 
                 double range = maxR - minR;
-                tabWithRealis[i] = x * (range / dimensionX) + minR;
+                tabWithRealis[i- subTabBeginPoint] = x * (range / dimensionX) + minR;
                 range = maxI - minI;
-                tabWithImaginaris[i] = y * (range / dimensionY) + minI;
+                tabWithImaginaris[i- subTabBeginPoint] = y * (range / dimensionY) + minI;
             }
             return;
         }
@@ -211,9 +211,9 @@ namespace MandelbrotApp
                     Console.WriteLine("{0}: {1} ", i, partOfBmTable[i]);
                 }*/
 
-                for (long i = 0; i < sizeOfSubTable; i++)
+                for (long i = 0; i < (sizeOfSubTable); i++)
                 {
-                    int n = (int)(partOfBmTable[i]/4.0);
+                    int n = (int)(partOfBmTable[i]/4);
                     //int r = ((int)(n * Math.Sinh(n)) % 256);
                     int r = ((n *2 *n) % 256);
                     int g = ((n * n) % 256);
@@ -256,9 +256,9 @@ namespace MandelbrotApp
             void saveBitmapToFile(byte[] bitmapTable, string fileSaveDirection)
             {
 
-                if (System.IO.File.Exists("C:\\Users\\0_0\\Documents\\Assemblerprojekt2\\tc2221t_assembler_mandelbrot\\MandelbrotProject\\OutputFiles\\MandelbrotFraktal.bmp"))
+                if (System.IO.File.Exists("C:\\Users\\0_0\\Documents\\Assembler_projekt\\tc2221t_assembler_mandelbrot\\MandelbrotProject\\OutputFiles\\MandelbrotFraktal.bmp"))
                 {
-                    System.IO.File.Delete("C:\\Users\\0_0\\Documents\\Assemblerprojekt2\\tc2221t_assembler_mandelbrot\\MandelbrotProject\\OutputFiles\\MandelbrotFraktal.bmp");
+                    System.IO.File.Delete("C:\\Users\\0_0\\Documents\\Assembler_projekt\\tc2221t_assembler_mandelbrot\\MandelbrotProject\\OutputFiles\\MandelbrotFraktal.bmp");
                 }
 
                 using (var bitmapImage = new Bitmap(resolutionX, resolutionY, PixelFormat.Format24bppRgb))
@@ -269,7 +269,7 @@ namespace MandelbrotApp
 
                     bitmapImage.UnlockBits(bmpData);
 
-                    bitmapImage.Save("C:\\Users\\0_0\\Documents\\Assemblerprojekt2\\tc2221t_assembler_mandelbrot\\MandelbrotProject\\OutputFiles\\MandelbrotFraktal.bmp");
+                    bitmapImage.Save("C:\\Users\\0_0\\Documents\\Assembler_projekt\\tc2221t_assembler_mandelbrot\\MandelbrotProject\\OutputFiles\\MandelbrotFraktal.bmp");
                 }
                 Console.WriteLine("Written to file!!");
                 //bitmapImage.Dispose();//cleaning up after the image
@@ -278,7 +278,7 @@ namespace MandelbrotApp
 
             void checkPartioningOfTheBitmap(Bitmap bitmapImage, string fileSaveDirection, int i)
             {
-                bitmapImage.Save("C:\\Users\\0_0\\Documents\\Assemblerprojekt2\\tc2221t_assembler_mandelbrot\\MandelbrotProject\\OutputFiles\\MandelbrotFraktalTest.bmp");
+                bitmapImage.Save("C:\\Users\\0_0\\Documents\\Assembler_projekt\\tc2221t_assembler_mandelbrot\\MandelbrotProject\\OutputFiles\\MandelbrotFraktalTest.bmp");
                 bitmapImage.Dispose();//cleaning up after the image
                 return;
             }
@@ -402,6 +402,7 @@ namespace MandelbrotApp
                     sizeOfSubTable += offset;
                 }
 
+                stopWatch.Start();
                 for (int i = 0; i<threadsInput; i++)
                 {
                     //correct the begginig of the second thread tab beggining
