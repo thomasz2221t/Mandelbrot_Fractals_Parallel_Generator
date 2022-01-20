@@ -27,6 +27,12 @@
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(OutDir)\Mandelbrotdll.obj;%(Outputs)</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ml64 /c /Zi /Fo$(OutDir)\Mandelbrotdll.obj Mandelbrotdll.asm</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)\Mandelbrotdll.obj;%(Outputs)</Outputs>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">ml64 /c /Zi /Fo$(OutDir)\Mandelbrotdll.obj Mandelbrotdll.asm</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ml64 /c /Zi /Fo$(OutDir)\Mandelbrotdll.obj Mandelbrotdll.asm</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(OutDir)\Mandelbrotdll.obj;%(Outputs)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)\Mandelbrotdll.obj;%(Outputs)</Outputs>
     </CustomBuild>
     <None Include="Mandelbrotdll.def" />
   </ItemGroup>

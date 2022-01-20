@@ -12,6 +12,7 @@ using System.Threading;
 using System.Diagnostics;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Globalization;
 
 namespace MandelbrotApp
 {
@@ -22,10 +23,16 @@ namespace MandelbrotApp
             InitializeComponent();
         }
 
-        [DllImport("C:\\Users\\0_0\\Documents\\Assembler_projekt\\tc2221t_assembler_mandelbrot\\MandelbrotProject\\x64\\Debug\\MandelbrotDllCpp.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "generateMandelbrotFraktalCpp")]
+        //Debug
+        //[DllImport("C:\\Users\\0_0\\Documents\\Assembler_projekt\\tc2221t_assembler_mandelbrot\\MandelbrotProject\\x64\\Debug\\MandelbrotDllCpp.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "generateMandelbrotFraktalCpp")]
+        //Release
+        [DllImport(@"C:\Users\0_0\Documents\Assembler_projekt\tc2221t_assembler_mandelbrot\MandelbrotProject\x64\Release\MandelbrotDllCpp.dll")]
         public static extern long generateMandelbrotFraktalCpp(byte[] imageBuffer, long subTabBeginPoint, long sizeOfSubTable, int dimensionX, int dimensionY, long maxIteration, double minR, double maxR, double minI, double maxI);
 
-        [DllImport("C:\\Users\\0_0\\Documents\\Assembler_projekt\\tc2221t_assembler_mandelbrot\\MandelbrotProject\\x64\\Debug\\MandelbrotDllAsm.dll")]
+        //Debug
+        //[DllImport("C:\\Users\\0_0\\Documents\\Assembler_projekt\\tc2221t_assembler_mandelbrot\\MandelbrotProject\\x64\\Debug\\MandelbrotDllAsm.dll")]
+        //Release
+        [DllImport(@"C:\Users\0_0\Documents\Assembler_projekt\tc2221t_assembler_mandelbrot\MandelbrotProject\x64\Release\MandelbrotDllAsm.dll")]
         public static extern long generateMandelbrotFraktalAsm(double[] imageBuffer, double[] tableMappedToReal, double[] tableMappedToImaginaris,  long subTabBeginPoint, long sizeOfSubTable, long maxIteration);
 
         long iteratorInput; //the input value set by the user as number of iteration cycles
@@ -34,10 +41,10 @@ namespace MandelbrotApp
         int resolutionX; //resolution horizontal parameter
         int resolutionY; //resolution vertical parameter 
         string outputFilePath; //path to the output file with fractal
-        double maxRealis = 0.7;
-        double minRealis = -1.5;
-        double maxImaginaris = -1.0;
-        double minImaginaris = 1;
+        double maxRealis; //0.7
+        double minRealis; //-1.5
+        double maxImaginaris; //1.0
+        double minImaginaris; //-1.0
 
         static Mutex objMutex = new Mutex();
         private void iterationLabel_Click(object sender, EventArgs e)
@@ -128,15 +135,39 @@ namespace MandelbrotApp
 
         private void outputButton_Click(object sender, EventArgs e)
         {
-            outputFilePath = outputBox.Text;
+
+            if (outputBox.Text.Length > 0)
+            {
+                outputFilePath = outputBox.Text;
+            }
+            else
+            {
+                OpenFileDialog v1 = new OpenFileDialog();
+                v1.Title = "Select saving direction of Mandelbrot fractal.";
+                v1.Filter = "All files (*.*)|*.*";
+                if (v1.ShowDialog() == DialogResult.OK)
+                {
+                    outputBox.Text = v1.FileName;
+                }
+            }
+
+            //powiadomienie, ze sciezka nie istnieje
+        }
+
+        private void complexPlaneButton_Click(object sender, EventArgs e)
+        {
+            maxRealis = double.Parse(maxRealisText.Text, CultureInfo.InvariantCulture);
+            minRealis = double.Parse(minRealisText.Text, CultureInfo.InvariantCulture);
+            maxImaginaris = double.Parse(maxImaginarisText.Text, CultureInfo.InvariantCulture);
+            minImaginaris = double.Parse(minImaginarisText.Text, CultureInfo.InvariantCulture);
         }
 
         private void proceedButton_Click(object sender, EventArgs e)
         {
             //void runMandelbrotDllCpp(Bitmap partOfBitmap, int bitMapX, int bitMapY, int dimensionX, int dimensionY, long maxIteration, int numThreads, double minR, double maxR, double minI, double maxI)
-            void runMandelbrotDllCpp(byte[] bitMapValuesTable, long subTabBeginPoint, long sizeOfSubTable, int dimensionX, int dimensionY, long maxIteration, double minR, double maxR, double minI, double maxI)
+            void runMandelbrotDllCpp(byte[] bitMapValuesTable, long subTabBeginPoint, long sizeOfSubTableCpp, int dimensionX, int dimensionY, long maxIteration, double minR, double maxR, double minI, double maxI)
             {
-                Console.WriteLine("Threat input: begin at: {0}, size: {1}", subTabBeginPoint, sizeOfSubTable);
+                Console.WriteLine("Threat input: begin at: {0}, size: {1}", subTabBeginPoint, sizeOfSubTableCpp);
                 //Bitmap bitmapFrame = partOfBitmap;
                 //BitmapData bmpData = bitmapFrame.LockBits(new Rectangle(0,0, bitmapFrame.Width, bitmapFrame.Height), System.Drawing.Imaging.ImageLockMode.ReadWrite, System.Drawing.Imaging.PixelFormat.Format32bppRgb);
                 // Get the address of the first line.
@@ -147,10 +178,10 @@ namespace MandelbrotApp
                 // Copy the RGB values into the array.
                 //System.Runtime.InteropServices.Marshal.Copy(ptr, bitmapValuesTable, 0, bitmapBytesCount);
 
-                byte[] partOfBmTable = new byte[3*sizeOfSubTable];
+                byte[] partOfBmTable = new byte[3*sizeOfSubTableCpp];
 
                 //Executing the cpp function
-                long result = generateMandelbrotFraktalCpp(partOfBmTable, subTabBeginPoint, sizeOfSubTable, dimensionX, dimensionY, maxIteration, minR, maxR, minI, maxI);
+                long result = generateMandelbrotFraktalCpp(partOfBmTable, subTabBeginPoint, sizeOfSubTableCpp, dimensionX, dimensionY, maxIteration, minR, maxR, minI, maxI);
                 Console.WriteLine("result: {0}", result);
 
 
@@ -161,7 +192,7 @@ namespace MandelbrotApp
                     Console.WriteLine("{0}: {1} ", i, partOfBmTable[i]);
                 }*/
 
-                for (long  i = 3*subTabBeginPoint; i<3*(sizeOfSubTable+subTabBeginPoint); i++)
+                for (long  i = 3*subTabBeginPoint; i<3*(sizeOfSubTableCpp+subTabBeginPoint); i++)
                 {
                     bitMapValuesTable[i] = partOfBmTable[i-3*subTabBeginPoint];
                 }
@@ -177,17 +208,17 @@ namespace MandelbrotApp
                 return;
             }
 
-            void runMandelbrotDllAsm(byte[] bitMapValuesTable, long subTabBeginPoint, long sizeOfSubTable, int dimensionX, int dimensionY, long maxIteration, double minR, double maxR, double minI, double maxI)
+            void runMandelbrotDllAsm(byte[] bitMapValuesTable, long subTabBeginPoint, long sizeOfSubTableAsm, int dimensionX, int dimensionY, long maxIteration, double minR, double maxR, double minI, double maxI)
             {
-                int offset = 0;
-                if(sizeOfSubTable % 4 != 0)
+                int offsetAsm = 0;
+                if(sizeOfSubTableAsm % 4 != 0)
                 { 
-                    offset = (int)sizeOfSubTable % 4;
+                    offsetAsm = (int)sizeOfSubTableAsm % 4;
                 }
-                double[] tableMappedToReal = new double[sizeOfSubTable + offset];
-                double[] tableMappedToImaginaris = new double[sizeOfSubTable + offset];
+                double[] tableMappedToReal = new double[sizeOfSubTableAsm + offsetAsm];
+                double[] tableMappedToImaginaris = new double[sizeOfSubTableAsm + offsetAsm];
 
-                mapToRelisAndImaginaris(tableMappedToReal, tableMappedToImaginaris, subTabBeginPoint, sizeOfSubTable, dimensionX, dimensionY, minR, maxR, minI, maxI);
+                mapToRelisAndImaginaris(tableMappedToReal, tableMappedToImaginaris, subTabBeginPoint, sizeOfSubTableAsm, dimensionX, dimensionY, minR, maxR, minI, maxI);
 
                 /*for (long i = subTabBeginPoint; i < sizeOfSubTable; i++)
                 {
@@ -199,9 +230,9 @@ namespace MandelbrotApp
                     Console.WriteLine("Imaginaris: {0}: {1} ", i, tableMappedToImaginaris[i]);
                 }*/
 
-                double[] partOfBmTable = new double[sizeOfSubTable + offset]; //tablica przechowujaca ilosc iteracji wykonana dla pikseli
+                double[] partOfBmTable = new double[sizeOfSubTableAsm + offsetAsm]; //tablica przechowujaca ilosc iteracji wykonana dla pikseli
 
-                long iteracja = generateMandelbrotFraktalAsm(partOfBmTable, tableMappedToReal, tableMappedToImaginaris, subTabBeginPoint, sizeOfSubTable,  maxIteration);
+                long iteracja = generateMandelbrotFraktalAsm(partOfBmTable, tableMappedToReal, tableMappedToImaginaris, subTabBeginPoint, sizeOfSubTableAsm,  maxIteration);
 
                 Console.WriteLine("liczba iteracji: {0}",iteracja);
                 Console.WriteLine($"Thread {Thread.CurrentThread.ManagedThreadId} Waiting...");
@@ -211,7 +242,7 @@ namespace MandelbrotApp
                     Console.WriteLine("{0}: {1} ", i, partOfBmTable[i]);
                 }*/
 
-                for (long i = 0; i < (sizeOfSubTable); i++)
+                for (long i = 0; i < (sizeOfSubTableAsm); i++)
                 {
                     int n = (int)(partOfBmTable[i]/4);
                     //int r = ((int)(n * Math.Sinh(n)) % 256);
@@ -255,10 +286,16 @@ namespace MandelbrotApp
 
             void saveBitmapToFile(byte[] bitmapTable, string fileSaveDirection)
             {
-
-                if (System.IO.File.Exists("C:\\Users\\0_0\\Documents\\Assembler_projekt\\tc2221t_assembler_mandelbrot\\MandelbrotProject\\OutputFiles\\MandelbrotFraktal.bmp"))
+                // if (System.IO.File.Exists("C:\\Users\\0_0\\Documents\\Assembler_projekt\\tc2221t_assembler_mandelbrot\\MandelbrotProject\\OutputFiles\\MandelbrotFraktal.bmp"))
+                if (System.IO.File.Exists(outputFilePath))
                 {
-                    System.IO.File.Delete("C:\\Users\\0_0\\Documents\\Assembler_projekt\\tc2221t_assembler_mandelbrot\\MandelbrotProject\\OutputFiles\\MandelbrotFraktal.bmp");
+                    //if(pictureFractal.Image != null)
+                    //{
+                    //    pictureFractal.CancelAsync();
+                    //    pictureFractal.Image.Dispose();
+                    //    pictureFractal.Image = null;
+                    //}
+                    System.IO.File.Delete(outputFilePath);
                 }
 
                 using (var bitmapImage = new Bitmap(resolutionX, resolutionY, PixelFormat.Format24bppRgb))
@@ -269,9 +306,10 @@ namespace MandelbrotApp
 
                     bitmapImage.UnlockBits(bmpData);
 
-                    bitmapImage.Save("C:\\Users\\0_0\\Documents\\Assembler_projekt\\tc2221t_assembler_mandelbrot\\MandelbrotProject\\OutputFiles\\MandelbrotFraktal.bmp");
+                    bitmapImage.Save(outputFilePath);
                 }
                 Console.WriteLine("Written to file!!");
+                pictureFractal.Image = new Bitmap(outputFilePath, true);
                 //bitmapImage.Dispose();//cleaning up after the image
                 return;
             }
@@ -331,11 +369,23 @@ namespace MandelbrotApp
             threatsButton_Click(sender, EventArgs.Empty);
             resolutionButton_Click(sender, EventArgs.Empty);
             outputButton_Click(sender, EventArgs.Empty);
+            complexPlaneButton_Click(sender, EventArgs.Empty);
+            if(pictureFractal.Image != null)
+            {
+                pictureFractal.CancelAsync();
+                pictureFractal.Image.Dispose();
+                pictureFractal.Image = null;
+            }
             Console.WriteLine("iterator: {0}", iteratorInput);
             Console.WriteLine("threats: {0}", threadsInput);
             Console.WriteLine("cpp/asm: {0}", (isAsmOrCpp ? "cpp" : "asm"));
             Console.WriteLine("resolution: {0} x {1}", resolutionX, resolutionY);
             Console.WriteLine("file path: {0}", outputFilePath);
+
+            progressBar.Value=0;
+            //calculate offset for the progress bar, maximum of progress bar is 100 2 + liczba watkow
+            int progressBarOffset = progressBar.Maximum/(threadsInput+3);
+            progressBar.Increment(progressBarOffset);
 
             //Making integer table an bitmap
             //Bitmap bitmapObject = new Bitmap(resolutionX, resolutionY, PixelFormat.Format32bppRgb);
@@ -348,79 +398,58 @@ namespace MandelbrotApp
             Thread[] array_of_threads = new Thread[threadsInput]; //tablica do przechowywania wątków
             Stopwatch stopWatch = new Stopwatch();//obsluga czasu
 
-            if (isAsmOrCpp)
+           
+            //cpp
+            long sizeOfSubTable = (resolutionX * resolutionY) / threadsInput;
+            int offset = 0;
+            if (sizeOfSubTable * threadsInput < resolutionX * resolutionY)
             {
-                //cpp
-                long sizeOfSubTable = (resolutionX * resolutionY) / threadsInput;
-                int offset = 0;
-                if (sizeOfSubTable * threadsInput < resolutionX * resolutionY)
+                offset = (int)((resolutionX * resolutionY) - (sizeOfSubTable * threadsInput));
+                sizeOfSubTable += offset;
+            }
+
+            stopWatch.Start();
+            for (int i = 0; i<threadsInput; i++)
+            {
+                //Rectangle section = new Rectangle(new Point(0,(resolutionY/threadsInput)*i), new Size(resolutionX, resolutionY/ threadsInput));
+                //Bitmap partOfBitmap = cropBitmap(bitmapObject, section, 0, (resolutionY / threadsInput) * i);
+                //int x = partOfBitmap.Width;
+                //int y = partOfBitmap.Height;
+
+                //correct the begginig of the second thread tab beggining
+                if ((offset > 0)&&(i == 1))//if offset == 0 no effect
                 {
-                    offset = (int)((resolutionX * resolutionY) - (sizeOfSubTable * threadsInput));
-                    sizeOfSubTable += offset;
+                    sizeOfSubTable -= offset;
                 }
 
-                stopWatch.Start();
-                for (int i = 0; i<threadsInput; i++)
+                long subTabBeginPoint = 0;
+                if(i != 0)
                 {
-                    //Rectangle section = new Rectangle(new Point(0,(resolutionY/threadsInput)*i), new Size(resolutionX, resolutionY/ threadsInput));
-                    //Bitmap partOfBitmap = cropBitmap(bitmapObject, section, 0, (resolutionY / threadsInput) * i);
-                    //int x = partOfBitmap.Width;
-                    //int y = partOfBitmap.Height;
-
-                    //correct the begginig of the second thread tab beggining
-                    if ((offset > 0)&&(i == 1))//if offset == 0 no effect
-                    {
-                        sizeOfSubTable -= offset;
-                    }
-
-                    long subTabBeginPoint = 0;
-                    if(i != 0)
-                    {
-                        subTabBeginPoint = (sizeOfSubTable * i) + offset;
-                    }
-
+                    subTabBeginPoint = (sizeOfSubTable * i) + offset;
+                }
+                if (isAsmOrCpp)
+                {
+                    //cpp
                     array_of_threads[i] = new Thread(unused => runMandelbrotDllCpp(bitMapPixelValues, subTabBeginPoint, sizeOfSubTable, resolutionX, resolutionY, iteratorInput, minRealis, maxRealis, minImaginaris, maxImaginaris));
                     array_of_threads[i].Start();
-                    //Thread.Sleep(1000);
-
-                    //if(i==0)
-                    // {
-                    //checkPartioningOfTheBitmap(partOfBitmap,"",i);
-                    //  }
-                    //partOfBitmap.Dispose();
                 }
-                
-            }
-            else
-            {
-                //asm
-                long sizeOfSubTable = (resolutionX * resolutionY) / threadsInput;
-                int offset = 0;
-                if (sizeOfSubTable * threadsInput < resolutionX * resolutionY)
+                else
                 {
-                    offset = (int)((resolutionX * resolutionY) - (sizeOfSubTable * threadsInput));
-                    sizeOfSubTable += offset;
-                }
-
-                stopWatch.Start();
-                for (int i = 0; i<threadsInput; i++)
-                {
-                    //correct the begginig of the second thread tab beggining
-                    if ((offset > 0) && (i == 1))//if offset == 0 no effect
-                    {
-                        sizeOfSubTable -= offset;
-                    }
-
-                    long subTabBeginPoint = 0;
-                    if (i != 0)
-                    {
-                        subTabBeginPoint = (sizeOfSubTable * i) + offset;
-                    }
-
+                    //asm
                     array_of_threads[i] = new Thread(unused => runMandelbrotDllAsm(bitMapPixelValues, subTabBeginPoint, sizeOfSubTable, resolutionX, resolutionY, iteratorInput, minRealis, maxRealis, minImaginaris, maxImaginaris));
                     array_of_threads[i].Start();
                 }
+                //Thread.Sleep(1000);
+
+                //if(i==0)
+                // {
+                //checkPartioningOfTheBitmap(partOfBitmap,"",i);
+                //  }
+                //partOfBitmap.Dispose();
             }
+                
+            
+            
 
             //for (int i = 0; i < threadsInput; i++)
             //{
@@ -442,6 +471,7 @@ namespace MandelbrotApp
                  }
              }*/
 
+            progressBar.Increment(progressBarOffset);
             foreach (Thread workingThread in array_of_threads)
             {
                 workingThread.Join();
@@ -459,19 +489,19 @@ namespace MandelbrotApp
             }*/
 
             stopWatch.Stop();
-
+            progressBar.Increment(progressBarOffset);
             TimeSpan time_period = stopWatch.Elapsed;
             string elapsedTime = time_period.TotalMilliseconds.ToString();
             Console.WriteLine("Time of executing dll library in miliseconds {0} for dll library in language: {1}", elapsedTime, (isAsmOrCpp ? "cpp" : "asm"));
 
-            //checking bitMapPixelValue table
+            timeLabel.Text = isAsmOrCpp ? "Time of execution the algorithm from cpp dll: " + elapsedTime + " ms" : "Time of execution the algorithm from asm dll: " + elapsedTime + " ms";
             /*for (int i = 0; i < bitMapPixelValues.Length; i++)
              {
                  Console.Write("{0}: {1}, ",i,bitMapPixelValues[i]);
              }*/
 
             saveBitmapToFile(bitMapPixelValues, outputFilePath);
-
+            progressBar.Increment(progressBar.Maximum - progressBar.Value);
 
 
         }
