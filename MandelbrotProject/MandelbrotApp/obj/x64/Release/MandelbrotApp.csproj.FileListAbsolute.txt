@@ -7,3 +7,4 @@ C:\Users\0_0\Documents\Assembler_projekt\tc2221t_assembler_mandelbrot\Mandelbrot
 C:\Users\0_0\Documents\Assembler_projekt\tc2221t_assembler_mandelbrot\MandelbrotProject\MandelbrotApp\obj\x64\Release\MandelbrotApp.csproj.CoreCompileInputs.cache
 C:\Users\0_0\Documents\Assembler_projekt\tc2221t_assembler_mandelbrot\MandelbrotProject\MandelbrotApp\obj\x64\Release\MandelbrotApp.exe
 C:\Users\0_0\Documents\Assembler_projekt\tc2221t_assembler_mandelbrot\MandelbrotProject\MandelbrotApp\obj\x64\Release\MandelbrotApp.pdb
+C:\Users\0_0\Documents\Assembler_projekt\tc2221t_assembler_mandelbrot\MandelbrotProject\MandelbrotApp\obj\x64\Release\MandelbrotApp.csproj.AssemblyReference.cache

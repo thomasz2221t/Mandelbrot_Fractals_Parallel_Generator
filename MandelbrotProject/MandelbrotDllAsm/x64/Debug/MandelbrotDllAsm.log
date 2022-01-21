@@ -1,8 +1,10 @@
-﻿  Performing Custom Build Tools
+﻿C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Microsoft\VC\v160\Microsoft.CppClean.targets(77,5): warning : The process cannot access the file 'c:\users\0_0\documents\assembler_projekt\tc2221t_assembler_mandelbrot\mandelbrotproject\mandelbrotdllasm\x64\debug\mandelbrotdllasm.ilk' because it is being used by another process.
+  Performing Custom Build Tools
   Microsoft (R) Macro Assembler (x64) Version 14.29.30136.0
   Copyright (C) Microsoft Corporation.  All rights reserved.
   
    Assembling: Mandelbrotdll.asm
+  LINK : C:\Users\0_0\Documents\Assembler_projekt\tc2221t_assembler_mandelbrot\MandelbrotProject\x64\Debug\MandelbrotDllAsm.dll not found or not built by the last incremental link; performing full link
      Creating library C:\Users\0_0\Documents\Assembler_projekt\tc2221t_assembler_mandelbrot\MandelbrotProject\x64\Debug\MandelbrotDllAsm.lib and object C:\Users\0_0\Documents\Assembler_projekt\tc2221t_assembler_mandelbrot\MandelbrotProject\x64\Debug\MandelbrotDllAsm.exp
 MandelbrotDllAsm.exp : warning LNK4070: /OUT:JADll.dll directive in .EXP differs from output filename 'C:\Users\0_0\Documents\Assembler_projekt\tc2221t_assembler_mandelbrot\MandelbrotProject\x64\Debug\MandelbrotDllAsm.dll'; ignoring directive
   MandelbrotDllAsm.vcxproj -> C:\Users\0_0\Documents\Assembler_projekt\tc2221t_assembler_mandelbrot\MandelbrotProject\x64\Debug\MandelbrotDllAsm.dll
