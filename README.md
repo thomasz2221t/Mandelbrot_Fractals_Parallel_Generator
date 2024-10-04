@@ -1,2 +1,2 @@
-# tc2221t_assembler_mandelbrot
-Generating the mandelbrot fractals written in both assembler and cpp. University subject project
+#Mandelbrot_Fractals_Parallel_Generator
+.NET WinForms application with two DLLs attached - written in both assembler x64 and cpp, generating parallelly the Mandelbrot fractal.
